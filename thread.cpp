@@ -2,12 +2,22 @@
 #include <boost/thread.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/scoped_thread.hpp>
+#include <boost/thread/externally_locked.hpp>
 
+
+template<class T>
+void deletePtr(T *ptr , const char *ptrname , const char *funname , const int line)
+{
+    if (!ptr)
+        delete ptr;
+
+     std::cout << "位于" << funname << "函数中的第" << line << "行的指针：" << ptrname << "被释放成功了.." << std::endl;
+}
 
 
 void print_hello()
 {
-    std::cout << "hello thread" << std::endl;
+    std::cout << "\nhello thread" << std::endl;
 }
 
 void thread_test1()
@@ -67,16 +77,23 @@ void thread_test4()
 
 void thread_test5()
 {
-    
+    //boost::thread t1(print_hello);
+    boost::scoped_thread<> t(print_hello);
+    t.interrupt();
+    std::cout << "程序正常退出，记得释放指针!" << std::endl;
+    t.join();
+    //deletePtr(t1 , "thread_t1" , __func__ , __LINE__);
 }
+
+
 
 int main(int argc , char *argv)
 {
+    std::cout << "__cplusplus : " << __cplusplus << std::endl;
     //thread_test1();
     //thread_test2();
     //thread_test3();
-    thread_test4();
-
-    std::cout << "hello!\n";
+    //thread_test4();
+    //thread_test5();
     return 0;
 }
